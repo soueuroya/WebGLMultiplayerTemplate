@@ -1,8 +1,11 @@
+/*
+*@autor: Daniel Corbi Boldrin
+*@description:  Client Javascript code for the WebGL socket Multiplayer Template Project
+*/
 var socket = io() || {};
 socket.isReady = false;
 
 window.addEventListener('load', function() {
-	
 	var execInUnity = function(method) {
 		if (!socket.isReady) return;
 		var args = Array.prototype.slice.call(arguments, 1);

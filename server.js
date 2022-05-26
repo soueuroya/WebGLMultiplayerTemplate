@@ -18,7 +18,7 @@ var roomLookup = {};
 var sockets = {};
 
 io.on('connection', function(socket){
-	console.log('A user ready for connection!');
+	console.log('A user ready for connection!: ' + socket);
 	var currentUser;
 	var currentRoom;
 	
@@ -29,7 +29,7 @@ io.on('connection', function(socket){
 		socket.emit('PONG', socket.id,pack.msg);
 	});
 	
-	socket.on('JOIN_MULTIPLAYER', function (_data)
+	socket.on('JOIN_MULTIPLAYER', function (_data) // receiving player
 	{
 	    console.log('[JOIN_MULTIPLAYER] JOIN_MULTIPLAYER received!');
 		
@@ -68,7 +68,7 @@ io.on('connection', function(socket){
 		socket.broadcast.emit('PLAYER_INCOMING',currentUser.id,currentUser.name);
 	});//END_JOIN_MULTIPLAYER
 	
-	socket.on('CREATE_ROOM', function (_data)
+	socket.on('CREATE_ROOM', function (_data) // receiving room
 	{
 	    console.log('[CREATE_ROOM] CREATE ROOM received!');
 		
@@ -92,7 +92,7 @@ io.on('connection', function(socket){
 		console.log('[CREATE_ROOM] Total rooms: ' + rooms.length);
 	});//END_CREATE_ROOM
 	
-	socket.on('CLOSE_ROOM', function (_data)
+	socket.on('CLOSE_ROOM', function (_data) // receiving room
 	{
 		console.log('[CLOSE_ROOM] CLOSE ROOM received!');
 		
@@ -118,7 +118,7 @@ io.on('connection', function(socket){
 		}
     });//END_CLOSE_ROOM
 	
-	socket.on('JOIN_ROOM', function (_data) // room and player
+	socket.on('JOIN_ROOM', function (_data) // receiving room and player
 	{
 	    console.log('[JOIN_ROOM] JOIN ROOM received!');
 		
@@ -161,7 +161,7 @@ io.on('connection', function(socket){
 		}
 	});//END_JOIN_ROOM
 	
-	socket.on('LEAVE_ROOM', function (_data) // room and player
+	socket.on('LEAVE_ROOM', function (_data) // receiving room and player
 	{
 	    console.log('[LEAVE_ROOM] LEAVE ROOM received!');
 		
@@ -207,7 +207,7 @@ io.on('connection', function(socket){
 		}
 	});//END_LEAVE_ROOM
 	
-	socket.on('READY_ROOM', function (_data) // room and player
+	socket.on('READY_ROOM', function (_data) // receiving room and player
 	{
 	    console.log('[READY_ROOM] READY ROOM received!' + _data);
 		
@@ -256,7 +256,7 @@ io.on('connection', function(socket){
 		}
 	});//END_READY_ROOM
 	
-	socket.on('UNREADY_ROOM', function (_data) // room and player
+	socket.on('UNREADY_ROOM', function (_data) // receiving room and player
 	{
 	    console.log('[UNREADY_ROOM] UNREADY ROOM received!' + _data);
 		
@@ -305,7 +305,7 @@ io.on('connection', function(socket){
 		}
 	});//END_UNREADY_ROOM
 	
-	socket.on('KICK_PLAYER', function (_data) // room and player
+	socket.on('KICK_PLAYER', function (_data) // receiving room and player
 	{
 	    console.log('[KICK_PLAYER] KICK_PLAYER received!' + _data);
 		
@@ -352,7 +352,7 @@ io.on('connection', function(socket){
 		}
 	});//END_KICK_PLAYER
 	
-	socket.on('START_ROOM', function (_data) // room
+	socket.on('START_ROOM', function (_data) //receiving room
 	{
 		console.log('[START_ROOM] START ROOM received!');
 		
@@ -476,7 +476,7 @@ io.on('connection', function(socket){
 		}
 	});//END_END_GAME
 	
-	socket.on('MOVE_AND_ROTATE', function (_data)
+	socket.on('MOVE_AND_ROTATE', function (_data) // receiving position, rotation and velocity
 	{
 		console.log('[MOVE_AND_ROTATE] MOVE AND ROTATE received! ' + _data);
 		
@@ -497,7 +497,7 @@ io.on('connection', function(socket){
 			currentUser.isDead = true;
 			for (var i = 0; i < clients.length; i++)
 			{
-				if (clients[i].name == currentUser.name && clients[i].id == currentUser.id) 
+				if (clients[i].id == currentUser.id) 
 				{
 					if (currentRoom != null && currentRoom.id != null)
 					{
@@ -530,9 +530,18 @@ io.on('connection', function(socket){
 					}
 					console.log("User "+clients[i].name+" has disconnected");
 					clients.splice(i,1);
-				};
-			};
+				}
+				else
+				{
+					console.log("User "+clients[i].name+" could not be disconnected");
+				}
+			}
 			socket.broadcast.emit('USER_DISCONNECTED', currentUser.id);
+			console.log("Clients left connected: ");
+			for(var i = 0; i < clients.length; i++)
+			{
+				console.log(" - " + clients[i].name);	
+			}
 		}
     });//END_SOCKET_ON_disconnect
 });//END_IO.ON
