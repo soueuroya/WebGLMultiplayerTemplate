@@ -18,7 +18,7 @@ var roomLookup = {};
 var sockets = {};
 
 io.on('connection', function(socket){
-	console.log('A user ready for connection!: ' + socket);
+	console.log('A user ready for connection! Socked ID: ' + socket.id);
 	var currentUser;
 	var currentRoom;
 	
@@ -209,7 +209,7 @@ io.on('connection', function(socket){
 	
 	socket.on('READY_ROOM', function (_data) // receiving room and player
 	{
-	    console.log('[READY_ROOM] READY ROOM received!' + _data);
+	    console.log('[READY_ROOM] READY ROOM received!');
 		
 		var data = JSON.parse(_data);
         var left = false;
@@ -537,7 +537,7 @@ io.on('connection', function(socket){
 				}
 			}
 			socket.broadcast.emit('USER_DISCONNECTED', currentUser.id);
-			console.log("Clients left connected: ");
+			console.log("Clients still connected: ");
 			for(var i = 0; i < clients.length; i++)
 			{
 				console.log(" - " + clients[i].name);	
