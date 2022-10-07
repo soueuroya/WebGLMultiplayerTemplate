@@ -78,6 +78,14 @@ window.addEventListener('load', function() {
 		  window.unityInstance.SendMessage ('MultiplayerManager', 'OnLeaveRoom', currentRoomAtr);
 		}
 	});
+	
+	socket.on('LEAVE_GAME_SUCCESS', function(roomid,playerid) {
+		var currentRoomAtr = roomid+':'+playerid;
+		if(window.unityInstance!=null)
+		{
+		  window.unityInstance.SendMessage ('MultiplayerManager', 'OnLeaveGame', currentRoomAtr);
+		}
+	});
 		
 	socket.on('READY_ROOM_SUCCESS', function(roomid,playerid) {
 		var currentRoomAtr = roomid+':'+playerid;

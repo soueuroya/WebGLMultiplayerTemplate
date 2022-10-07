@@ -207,6 +207,52 @@ io.on('connection', function(socket){
 		}
 	});//END_LEAVE_ROOM
 	
+	socket.on('LEAVE_GAME', function (_data) // receiving room and player
+	{
+	    console.log('[LEAVE_GAME] LEAVE GAME received!');
+		
+		var data = JSON.parse(_data);
+        var left = false;
+		if (clientLookup[data.player] != null)
+		{
+			if (roomLookup[data.room] != null)
+			{
+				if (roomLookup[data.room].allPlayers.includes(clientLookup[data.player]))
+				{
+					if (roomLookup[data.room].confirmedPlayers.includes(currentUser))
+					{
+						roomLookup[data.room].confirmedPlayers.splice(roomLookup[data.room].confirmedPlayers.indexOf(clientLookup[currentUser.id]),1);
+					}
+					roomLookup[data.room].totalPlayers--;
+					socket.emit("LEAVE_GAME_SUCCESS",data.room,data.player);
+					socket.broadcast.emit("LEAVE_GAME_SUCCESS",data.room,data.player);
+					left = true;
+					roomLookup[data.room].allPlayers.splice(roomLookup[data.room].allPlayers.indexOf(clientLookup[data.player]),1); // remove user from room
+				}
+				else
+				{
+					console.log('[LEAVE_GAME] Player failed leaving room: R:' + data.room + " - P:" + data.player + " client not found in the room!");
+				}
+			}
+			else
+			{
+				console.log('[LEAVE_GAME] Player failed leaving room: R:' + data.room + " - P:" + data.player + " room not found!");
+			}
+		}
+		else
+		{
+			console.log('[LEAVE_GAME] Player failed leaving room: R:' + data.room + " - P:" + data.player + " client not found!");
+		}
+		if (!left)
+		{
+			console.log('[LEAVE_GAME] Player failed leaving room: R:' + data.room + " - P:" + data.player);
+		}
+		else
+		{
+			console.log('[LEAVE_GAME] Player P:' + data.player + ' left game: G:' + data.room);
+		}
+	});//END_LEAVE_GAME
+	
 	socket.on('READY_ROOM', function (_data) // receiving room and player
 	{
 	    console.log('[READY_ROOM] READY ROOM received!');
@@ -517,6 +563,10 @@ io.on('connection', function(socket){
 								rooms[j].totalPlayers--;
 								socket.emit('LEAVE_ROOM_SUCCESS', rooms[j].id, currentUser.id);
 								socket.broadcast.emit('LEAVE_ROOM_SUCCESS', rooms[j].id, currentUser.id);
+								if (rooms[j].isStarted)
+								{
+									socket.broadcast.emit('LEAVE_GAME_SUCCESS', rooms[j].id, currentUser.id);
+								}
 								console.log("Player in the room: "+rooms[j].id+" has been disconnected!");
 							}
 							if (rooms[j].id == currentUser.id)
